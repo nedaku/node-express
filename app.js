@@ -1,41 +1,47 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const express = require("express");
+const axios = require("axios");
+const cheerio = require("cheerio");
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const getHtml = async () => {
+  try {
+    return await axios.get("https://www.melon.com/chart/");
+  } catch (err) {
+    console.log("error");
+  }
+};
 
-var app = express();
+let chart = [];
+let time;
+const parsing = async () => {
+  const html = await getHtml();
+  const $ = cheerio.load(html.data);
+  const $chartList = $(".lst50");
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+  time = $(".calendar_prid .hour").text();
+  $chartList.each((index, node) => {
+    chart.push({
+      rank: $(node).find(".rank").text() + "위",
+      title: $(node).find(".ellipsis.rank01 span a").text(),
+      artist: $(node).find(".ellipsis.rank02 span a").text(),
+      img: $(node).find(".image_typeAll > img").attr("src"),
+    });
+  });
+};
+parsing();
+setInterval(function () {
+  var now = new Date();
+  if (now.getMinutes() == 0 && now.getSeconds() == 0) {
+    parsing();
+  }
+}, 60000);
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+const server = express();
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+server.get("/", (req, res) => {
+  res.send(chart);
 });
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+server.listen(3000, (err) => {
+  if (err) return console.log(err);
+  console.log("The server is listening on port 3000");
 });
-
-module.exports = app;
