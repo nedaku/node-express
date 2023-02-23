@@ -3,7 +3,11 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 const cors = require("cors");
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 const getHtml = async () => {
   try {
     return await axios.get("https://www.melon.com/chart/");
