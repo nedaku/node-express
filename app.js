@@ -3,11 +3,7 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 const cors = require("cors");
 const app = express();
-app.use(
-  cors({
-    origin: "*",
-  })
-);
+
 const getHtml = async () => {
   try {
     return await axios.get("https://www.melon.com/chart/");
@@ -41,13 +37,12 @@ setInterval(function () {
   }
 }, 1000);
 
-const server = express();
-
-server.get("/", (req, res) => {
+app.use(cors());
+app.get("/", (req, res) => {
   res.send(chart);
 });
 
-server.listen(3000, (err) => {
+app.listen(3000, (err) => {
   if (err) return console.log(err);
   console.log("The server is listening on port 3000");
 });
