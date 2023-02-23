@@ -1,7 +1,9 @@
 const express = require("express");
 const axios = require("axios");
 const cheerio = require("cheerio");
+const cors = require("cors");
 
+app.use(cors());
 const getHtml = async () => {
   try {
     return await axios.get("https://www.melon.com/chart/");
@@ -33,7 +35,7 @@ setInterval(function () {
   if (now.getMinutes() == 0 && now.getSeconds() == 0) {
     parsing();
   }
-}, 60000);
+}, 1000);
 
 const server = express();
 
