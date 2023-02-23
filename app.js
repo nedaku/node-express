@@ -2,7 +2,7 @@ const express = require("express");
 const axios = require("axios");
 const cheerio = require("cheerio");
 const cors = require("cors");
-
+const app = express();
 app.use(cors());
 const getHtml = async () => {
   try {
