@@ -33,6 +33,7 @@ parsing();
 setInterval(function () {
   var now = new Date();
   if (now.getMinutes() == 0 && now.getSeconds() == 0) {
+    chart = [];
     parsing();
   }
 }, 1000);
